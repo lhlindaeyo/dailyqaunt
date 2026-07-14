@@ -1,0 +1,36 @@
+{
+  "industries": [
+    { "name": "반도체", "sub": "Semiconductor", "file": "semiconductor.md" },
+    { "name": "2차전지", "sub": "Battery", "file": "battery.md" },
+    { "name": "바이오", "sub": "Bio/Healthcare", "file": "bio.md" },
+    { "name": "금융", "sub": "Financials", "file": "financials.md" }
+  ],
+  "targetMethods": [
+    {
+      "name": "PER 밸류에이션",
+      "sub": "P/E multiple",
+      "desc": "예상 EPS × 목표 PER 로 적정주가를 산출합니다.",
+      "url": "https://YOUR-STREAMLIT-APP.streamlit.app/Target_Price?method=per"
+    },
+    {
+      "name": "DCF",
+      "sub": "현금흐름할인",
+      "desc": "미래 잉여현금흐름을 할인해 내재가치를 계산합니다.",
+      "url": "https://YOUR-STREAMLIT-APP.streamlit.app/Target_Price?method=dcf"
+    },
+    {
+      "name": "RIM",
+      "sub": "잔여이익모형",
+      "desc": "자기자본 + 초과이익의 현재가치로 평가합니다.",
+      "url": "https://YOUR-STREAMLIT-APP.streamlit.app/Target_Price?method=rim"
+    }
+  ],
+  "backtest": {
+    "newBacktestUrl": "https://YOUR-STREAMLIT-APP.streamlit.app/New_Backtest",
+    "factors": [
+      { "name": "PER", "result": "CAGR 8.4%",  "date": "2026-07-10", "file": "low-per.md" },
+      { "name": "PBR", "result": "CAGR 11.2%", "date": "2026-07-05", "file": "low-pbr.md" },
+      { "name": "모멘텀", "result": "CAGR 14.5%", "date": "2026-06-20", "file": "momentum-12-1.md" }
+    ]
+  }
+}

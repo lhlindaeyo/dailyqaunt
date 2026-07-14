@@ -1,0 +1,4 @@
+# 로컬 개발 편의용 통합 설치 파일 (pipeline + streamlit_app)
+# pip install -r requirements.txt
+-r pipeline/requirements.txt
+-r streamlit_app/requirements.txt

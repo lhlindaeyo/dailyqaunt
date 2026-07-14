@@ -1,198 +1,75 @@
-# 📊 Quant Research Platform
+# 📊 Daily Quant
 
-개인 퀀트 리서치 플랫폼입니다. 한국(KRX) 및 미국(US) 주식 시장을 대상으로 알파 팩터 리서치, 전략 백테스팅, 기술적 지표 분석을 수행하고, 그 결과를 정적 웹사이트로 시각화합니다.
+개인 퀀트 리서치 플랫폼. **정적 프론트(GitHub Pages) + 데이터 파이프라인(GitHub Actions) + 계산 앱(Streamlit)** 3층 구조로 동작합니다.
 
-> **핵심 철학**: 분석은 로컬(VSCode)에서, 결과만 GitHub Pages에 게시합니다.
-
-🔗 **Live Site**: [your-username.github.io/quant-research](https://your-username.github.io/quant-research)
+- **프론트(`docs/`)** — 4개 탭 대시보드. GitHub Pages로 배포되는 순수 HTML/CSS/JS.
+- **파이프라인(`pipeline/` + Actions)** — 매일 매크로 지표를 수집해 `docs/data/macro.json` 생성.
+- **계산 앱(`streamlit_app/`)** — 백테스팅·목표주가 계산. Streamlit Community Cloud에 배포 후 프론트에서 링크로 연결.
 
 ---
 
-## 📁 프로젝트 구조
+## 📁 구조
 
 ```
-quant-research/
+dailyqaunt/
+├── docs/                       # GitHub Pages (Settings → Pages → main /docs)
+│   ├── index.html              # 4탭 SPA 껍데기
+│   ├── assets/
+│   │   ├── css/style.css        # 스크롤 스냅(가로) + 세로 스크롤
+│   │   └── js/                  # app(라우팅) / home / industry / backtest / target
+│   ├── data/
+│   │   ├── macro.json           # 9개 지표(GDP 포함) × 7일 (Actions가 생성)
+│   │   └── config.json          # 산업목록·계산법·Streamlit URL·백테스팅 팩터목록
+│   └── content/
+│       ├── industries/*.md      # 산업분석 글 (직접 작성)
+│       └── backtests/*.md       # 팩터별 백테스트 결과 글 (직접 작성)
 │
-├── research/                   # 로컬 분석 코드 (VSCode에서 실행)
-│   ├── data/                   # 데이터 수집
-│   │   ├── fetch_stock.py      # 종목 주가 / 거래량
-│   │   ├── fetch_index.py      # 대표 지수 (날짜 범위 입력)
-│   │   └── fetch_macro.py      # 매크로 데이터 (금리, 환율 등)
-│   │
-│   ├── indicators/             # 기술적 보조지표
-│   │   ├── trend.py            # MACD, EMA, SMA, 볼린저밴드
-│   │   ├── momentum.py         # RSI, Stochastic, ROC
-│   │   └── volume.py           # OBV, 거래량 이동평균
-│   │
-│   ├── alpha/                  # 알파 팩터 리서치
-│   │   ├── factor_momentum.py  # 모멘텀 팩터
-│   │   ├── factor_value.py     # 가치 팩터 (PER, PBR)
-│   │   ├── factor_quality.py   # 퀄리티 팩터 (ROE, 부채비율)
-│   │   └── factor_analysis.py  # 팩터 IC / 수익률 분석
-│   │
-│   ├── backtest/               # 백테스팅 엔진
-│   │   ├── engine.py           # Backtrader 설정
-│   │   ├── strategies/         # 전략 모음
-│   │   │   ├── momentum_strategy.py
-│   │   │   ├── mean_reversion.py
-│   │   │   └── factor_strategy.py
-│   │   └── run_backtest.py     # 백테스트 실행 → JSON 저장
-│   │
-│   └── export/                 # 결과 → JSON 변환
-│       ├── export_chart.py
-│       ├── export_backtest.py
-│       └── export_factor.py
+├── pipeline/
+│   ├── fetch_macro.py           # yfinance(+FRED GDP) → docs/data/macro.json
+│   └── requirements.txt
 │
-├── output/                     # ⚠️ gitignore — 로컬 결과 저장소
+├── streamlit_app/               # Streamlit Cloud 배포 (main file: Home.py)
+│   ├── Home.py
+│   ├── pages/
+│   │   ├── 1_Backtest.py
+│   │   ├── 2_New_Backtest.py    # 프론트 '파란 도형' 링크 대상
+│   │   └── 3_Target_Price.py    # ?method=per|dcf|rim 쿼리 분기
+│   └── requirements.txt
 │
-├── site/                       # GitHub Pages 정적 사이트
-│   ├── data/                   # output/ 에서 복사한 JSON
-│   ├── assets/                 # CSS / JS
-│   ├── index.html              # 메인 대시보드
-│   ├── stock.html              # 종목 차트
-│   ├── backtest.html           # 백테스트 결과
-│   └── factor.html             # 팩터 리서치
+├── research/                     # 로컬 전용 리서치/백테스트 엔진 (추후 streamlit_app과 연결 예정)
 │
-├── docs/
-│   ├── SETUP.md                # 환경 세팅 가이드
-│   └── HOW_TO_USE.md           # 기능별 사용법
-│
-├── .env.example                # API 키 양식
-├── requirements.txt
-└── README.md
+├── .env.example                  # FRED_API_KEY 등 로컬 환경변수 템플릿
+└── .github/workflows/update-data.yml   # 매일 06:00 KST + 수동 실행
 ```
 
----
+## 🧩 탭별 동작
 
-## ⚙️ 환경 세팅
+| 탭 | 아이콘 | 동작 |
+| --- | --- | --- |
+| 홈 | ⌂ | 9개 지표 카드(GDP는 분기 배지로 표시) + **Run** 시 최근 7일치 표. 데이터는 Actions가 매일 자동 갱신, Run은 최신 캐시를 재조회 |
+| 산업분석 | ⌕ | 가로 슬라이드로 산업 선택 → `content/industries/*.md` 렌더 |
+| 백테스팅 | ▤ | Find Alpha(팩터별 백테스트 결과 요약) 클릭 → 하단에 해당 팩터의 결과 글 렌더 · 파란도형(새 백테스팅) → Streamlit |
+| 목표주가 | ◈ | 가로 슬라이드로 계산법 선택 → Streamlit 계산기 |
 
-### 1. 저장소 클론
+## 🚀 세팅
+
+**1. GitHub Pages 켜기** — Settings → Pages → Source: `main` 브랜치 `/docs` 폴더.
+
+**2. Streamlit 배포** — [share.streamlit.io](https://share.streamlit.io) 에서 이 repo 연결, Main file path `streamlit_app/Home.py`. 배포 URL을 `docs/data/config.json` 의 `targetMethods[].url`·`backtest.newBacktestUrl` 에 입력.
+
+**3. 데이터 자동화** — Actions 탭에서 `Update market data` 워크플로우 활성화. 즉시 실행하려면 `Run workflow` 클릭.
+GDP 카드를 채우려면 저장소 Settings → Secrets and variables → Actions 에 `FRED_API_KEY`를 등록하세요 ([무료 발급](https://fred.stlouisfed.org/docs/api/api_key.html)). 키가 없으면 GDP 카드 없이 나머지 8개 지표만 갱신됩니다.
+
+**4. 글 추가** — `docs/content/industries/`(산업분석) 또는 `docs/content/backtests/`(팩터별 백테스트 결과)에 `.md` 작성 → `config.json` 에 항목 추가 → 커밋.
+
+## 🧪 로컬 테스트
 
 ```bash
-git clone https://github.com/your-username/quant-research.git
-cd quant-research
+pip install -r requirements.txt         # pipeline + streamlit_app 의존성 한 번에 설치
+cp .env.example .env && $EDITOR .env    # FRED_API_KEY 입력 (선택)
+python pipeline/fetch_macro.py          # macro.json 갱신
+python -m http.server -d docs 8000      # http://localhost:8000 에서 프론트 확인
+streamlit run streamlit_app/Home.py     # 계산 앱 확인
 ```
 
-### 2. Python 패키지 설치
-
-Python 3.10 이상을 권장합니다.
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. API 키 설정
-
-`.env.example`을 복사해서 `.env` 파일을 만들고 키를 입력합니다.
-
-```bash
-cp .env.example .env
-```
-
-```env
-# .env
-KOREA_INVESTMENT_APP_KEY=your_key_here
-KOREA_INVESTMENT_APP_SECRET=your_secret_here
-```
-
-> `.env` 파일은 gitignore에 포함되어 있어 GitHub에 올라가지 않습니다.
-
----
-
-## 🚀 사용 방법
-
-### 종목 데이터 수집
-
-```bash
-# 삼성전자 최근 1년 주가 수집
-python research/data/fetch_stock.py --ticker 005930 --market KRX --period 1y
-
-# 애플 주가 수집
-python research/data/fetch_stock.py --ticker AAPL --market US --period 1y
-```
-
-### 지수 데이터 수집
-
-```bash
-# KOSPI 날짜 범위로 수집
-python research/data/fetch_index.py --index KOSPI --start 2020-01-01 --end 2024-12-31
-```
-
-### 보조지표 계산
-
-```bash
-# MACD, 볼린저밴드 등 계산
-python research/indicators/trend.py --ticker 005930
-```
-
-### 백테스트 실행
-
-```bash
-# 모멘텀 전략 백테스트
-python research/backtest/run_backtest.py --strategy momentum --start 2020-01-01 --end 2024-12-31
-```
-
-### 결과 사이트에 반영
-
-```bash
-# output/ → site/data/ 복사 후 push
-cp -r output/ site/data/
-git add site/data/
-git commit -m "update: 백테스트 결과 업데이트"
-git push
-```
-
-GitHub Pages가 자동으로 사이트를 업데이트합니다.
-
----
-
-## 🛠️ 기술 스택
-
-| 구분 | 기술 |
-|------|------|
-| 데이터 수집 | `yfinance`, `pykrx` |
-| 데이터 처리 | `pandas`, `numpy` |
-| 보조지표 | `pandas-ta` |
-| 백테스팅 | `backtrader` |
-| 성과 분석 | `pyfolio-reloaded` |
-| 팩터 분석 | `alphalens-reloaded` |
-| 프론트엔드 | HTML / CSS / JavaScript |
-| 차트 | TradingView Lightweight Charts |
-| 배포 | GitHub Pages |
-
----
-
-## 📈 주요 기능
-
-- **종목 차트**: 주가 + 거래량 + 보조지표(MACD, RSI, 볼린저밴드 등) 시각화
-- **지수 조회**: KOSPI, KOSDAQ, S&P500, NASDAQ 등 날짜 범위로 조회
-- **알파 팩터 리서치**: 모멘텀 / 가치 / 퀄리티 팩터 분석 및 IC 계산
-- **백테스팅**: 전략별 수익률, MDD, 샤프비율 분석
-- **대시보드**: 분석 결과 종합 리포트
-
----
-
-## 📋 워크플로우
-
-```
-1. research/data/       → 데이터 수집
-2. research/indicators/ → 보조지표 계산
-3. research/alpha/      → 팩터 분석
-4. research/backtest/   → 백테스트 실행
-5. research/export/     → JSON 변환
-          ↓
-6. output/ 저장 (로컬 전용)
-          ↓
-7. site/data/ 복사 → git push
-          ↓
-8. GitHub Pages 자동 반영
-```
-
----
-
-## ⚠️ 주의사항
-
-- `output/` 폴더는 gitignore 처리되어 GitHub에 올라가지 않습니다.
-- `.env` 파일에 API 키를 저장하고 절대 커밋하지 마세요.
-- 본 프로젝트는 **투자 권유가 아닙니다**. 리서치 및 학습 목적으로만 사용하세요.
-
+> 본 프로젝트는 투자 권유가 아니며 리서치/학습 목적입니다.

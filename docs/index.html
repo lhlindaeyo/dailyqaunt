@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Quant</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <!-- 마크다운 렌더 (산업분석/백테스팅 글) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- 좌측 사이드바 -->
+    <aside class="sidebar">
+      <div class="logo">$</div>
+      <nav>
+        <button class="nav-btn active" data-tab="home"     title="홈 · 대표지수/캘린더">⌂</button>
+        <button class="nav-btn"        data-tab="industry" title="산업분석">⌕</button>
+        <button class="nav-btn"        data-tab="backtest" title="백테스팅">▤</button>
+        <button class="nav-btn"        data-tab="target"   title="목표주가 계산">◈</button>
+      </nav>
+    </aside>
+
+    <!-- 메인 -->
+    <main class="content">
+      <!-- 홈 -->
+      <section id="tab-home" class="tab active">
+        <h1>Market Dashboard</h1>
+        <div id="home-grid" class="grid-9"><!-- 9개 지표 카드 (home.js) --></div>
+        <div class="toolbar">
+          <button id="home-run" class="btn-primary">Run · 최근 7일</button>
+          <span id="home-updated" class="muted"></span>
+        </div>
+        <div id="home-detail" class="panel scroll-y"><!-- 7일치 표 --></div>
+      </section>
+
+      <!-- 산업분석 -->
+      <section id="tab-industry" class="tab">
+        <h1>Research Dashboard</h1>
+        <div id="industry-chips" class="row-scroll"><!-- 산업 가로선택 (industry.js) --></div>
+        <div id="industry-body" class="panel scroll-y markdown"><!-- 선택 산업 md 렌더 --></div>
+      </section>
+
+      <!-- 백테스팅 -->
+      <section id="tab-backtest" class="tab">
+        <h1>Backtesting</h1>
+        <div class="backtest-top">
+          <div id="alpha-card" class="card find-alpha">
+            <div class="card-title">Find Alpha</div>
+            <ul id="alpha-list"><!-- 팩터별 백테스트 결과 요약, 클릭 시 아래 렌더 (backtest.js) --></ul>
+          </div>
+          <a id="new-backtest" class="blue-box" href="#" target="_blank" rel="noopener">
+            <span>+ 새 백테스팅</span>
+          </a>
+        </div>
+        <div id="backtest-body" class="panel scroll-y markdown"><!-- 선택한 팩터의 백테스트 결과 글 렌더 --></div>
+      </section>
+
+      <!-- 목표주가 -->
+      <section id="tab-target" class="tab">
+        <h1>Target Price</h1>
+        <div id="target-chips" class="row-scroll"><!-- 계산법 가로선택 (target.js) --></div>
+        <div id="target-body" class="panel scroll-y"><!-- 계산법 설명 + Streamlit 링크 --></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./assets/js/app.js"></script>
+  <script src="./assets/js/home.js"></script>
+  <script src="./assets/js/industry.js"></script>
+  <script src="./assets/js/backtest.js"></script>
+  <script src="./assets/js/target.js"></script>
+</body>
+</html>
