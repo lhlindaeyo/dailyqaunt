@@ -4,33 +4,50 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daily Quant</title>
+
+  <!-- 프로페셔널 웹폰트: Inter(UI) + IBM Plex Mono(숫자) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="./assets/css/style.css" />
   <!-- 마크다운 렌더 (산업분석/백테스팅 글) -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
   <div class="app">
-    <!-- 좌측 사이드바 -->
+    <!-- 좌측 사이드바 (접기/펼치기) -->
     <aside class="sidebar">
-      <div class="logo">DQ</div>
+      <div class="sidebar-head">
+        <div class="brand">
+          <span class="brand-mark">Q</span>
+          <span class="brand-full">Daily&nbsp;Quant</span>
+        </div>
+        <button class="collapse-btn" id="collapse-btn" title="사이드바 접기/펼치기" aria-label="사이드바 접기/펼치기">
+          <span class="chev">‹</span>
+        </button>
+      </div>
       <nav>
-        <button class="nav-btn active" data-tab="home"     title="홈 · 대표지수/캘린더"><span class="nav-ico">⌂</span><span class="nav-label">Markets</span></button>
+        <button class="nav-btn active" data-tab="home"     title="대표지수 · 매크로"><span class="nav-ico">⌂</span><span class="nav-label">Markets</span></button>
         <button class="nav-btn"        data-tab="industry" title="산업분석"><span class="nav-ico">⌕</span><span class="nav-label">Research</span></button>
         <button class="nav-btn"        data-tab="backtest" title="백테스팅"><span class="nav-ico">▤</span><span class="nav-label">Backtest</span></button>
         <button class="nav-btn"        data-tab="target"   title="목표주가 계산"><span class="nav-ico">◈</span><span class="nav-label">Target</span></button>
       </nav>
+      <div class="sidebar-foot">
+        <span class="foot-dot"></span><span class="foot-txt">Research Terminal</span>
+      </div>
     </aside>
 
     <!-- 메인 -->
     <main class="content">
-      <!-- 상단 브랜드 헤더 -->
+      <!-- 상단 헤더 (현재 섹션명 + 상태) -->
       <header class="topbar">
-        <div class="wordmark">DAILY&nbsp;<span>QUANT</span></div>
-        <div class="topbar-meta">Personal Quant Research Terminal</div>
+        <h1 class="page-title" id="page-title">Market Dashboard</h1>
+        <div class="topbar-meta" id="topbar-meta">Personal Quant Research</div>
       </header>
+
       <!-- 홈 -->
       <section id="tab-home" class="tab active">
-        <h1>Market Dashboard</h1>
         <div id="home-grid" class="grid-9"><!-- 9개 지표 카드 (home.js) --></div>
         <div class="toolbar">
           <button id="home-run" class="btn-primary">Run · 최근 7일</button>
@@ -41,21 +58,20 @@
 
       <!-- 산업분석 -->
       <section id="tab-industry" class="tab">
-        <h1>Research Dashboard</h1>
         <div id="industry-chips" class="row-scroll"><!-- 산업 가로선택 (industry.js) --></div>
         <div id="industry-body" class="panel scroll-y markdown"><!-- 선택 산업 md 렌더 --></div>
       </section>
 
       <!-- 백테스팅 -->
       <section id="tab-backtest" class="tab">
-        <h1>Backtesting</h1>
         <div class="backtest-top">
           <div id="alpha-card" class="card find-alpha">
             <div class="card-title">Find Alpha</div>
             <ul id="alpha-list"><!-- 팩터별 백테스트 결과 요약, 클릭 시 아래 렌더 (backtest.js) --></ul>
           </div>
           <a id="new-backtest" class="blue-box" href="#" target="_blank" rel="noopener">
-            <span>+ 새 백테스팅</span>
+            <span class="bb-plus">+</span>
+            <span class="bb-label">새 백테스팅</span>
           </a>
         </div>
         <div id="backtest-body" class="panel scroll-y markdown"><!-- 선택한 팩터의 백테스트 결과 글 렌더 --></div>
@@ -63,7 +79,6 @@
 
       <!-- 목표주가 -->
       <section id="tab-target" class="tab">
-        <h1>Target Price</h1>
         <div id="target-chips" class="row-scroll"><!-- 계산법 가로선택 (target.js) --></div>
         <div id="target-body" class="panel scroll-y"><!-- 계산법 설명 + Streamlit 링크 --></div>
       </section>
